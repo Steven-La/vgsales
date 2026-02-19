@@ -1,0 +1,12 @@
+---
+title: "Video Game Sales 1980-2016"
+author: "Steven Lautenbach & Mathias Thyssen"
+date: "2026-02-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
