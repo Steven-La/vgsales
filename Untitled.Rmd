@@ -10,3 +10,82 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R Markdown
+
+# 1. Introduction
+
+## Main Question
+
+- The main question here would be: What is the effect of being a Shooter video game on global sales? 
+
+- The x variable is the is an indicator equal to 1 if a game belongs to the Shooter genre, and 0 otherwise. The Y variable is the global sales amount, measured in millions of copies sold.
+
+- This is a causal question because we are not simply asking whether Shooter games sell more, but whether being a Shooter game causes higher sales.
+
+## Why this question matters 
+
+- This question is relevant to game developers, Publishers, investors, and platform companies such as Sony, Microsoft, and Nintendo.
+
+- Knowing whether or not a certain genre (in this case shooter games) can lead to higher sales is truly relevant to the gaming industry in order to allocate more development resources to those genres, adjust portfolio strategies, invest differently in marketing, and plan platform exclusives strategically.
+
+- Moreover, for business decision-makers, knowing whether the genre itself increases sales (holding other factors constant) improves strategic planning.
+
+## Why this question is not obvious
+
+- This question is not obvious because of the fact that simply observing that a certain genre of games sells more does not mean genre causes higher sales. There could be other factors that influence this such as:
+
+- The type of platforms: Where some can have larger audiences or even favor/support specific genres of games (Which will reflect on the sales for that video game).
+
+- Time trends: The gaming market has expanded significantly over time (From 1980s to 2010s). This could also have the idea that there was greater digital distribution of games (more available), and that consumer preferences for certain genres could have changed over time.
+
+- Popular franchise games: The popularity of certain game titles could also be another variable that impacts sales rather than simply just genre. This is because big game franchises will have loyal fan bases, receive large marketing budgets, and get a lot of repeat sales. More or less, higher sales could reflect more brand recognition rather than genre.
+
+## Why descriptive statistics alone are not enough to answer this question and regression  bias explanation.
+
+- Looking at descriptive statistics will only mean that we are observing correlation rather than watching for a more "causal" relationship. Even if Shooter games appear to sell more on average, this does not necessarily imply that the Shooter genre causes higher sales.
+
+- The omitted variable bias in the regression being done will also be shown because of the factors mentioned in the previous section (Platforms differences, time trends, and franchise status).
+
+
+# About the Data
+## Data Source
+
+- The primary dataset used in this analysis is the Video Game Sales dataset (1980–2016), originally compiled from retail sales data reported by VGChartz, a widely cited video game market tracking firm that aggregates global physical retail sales across major regions (North America, Europe, Japan, and Other regions). The dataset is publicly distributed for academic use via repositories such as: Kaggle and Public GitHub mirrors of the original VGChartz compilation.
+
+- The dataset is widely used in academic and applied data analysis projects studying video game market performance.
+
+- The dataset covers commercially released console video games between 1980 and 2016.
+
+## Sample Coverage
+
+- The dataset represents the physical console videogame market over this period
+
+## Unit of observation
+
+- Each row corresponds to a single game released on a specific platform.
+
+## Number of obsrvations
+
+- The dataset contains 16,599 game-platform observations.
+
+## Frequency
+
+- Since it is based on release year of each video game, it is yearly data frequency.
+
+## Variables
+
+- The dataset contains the following key variables:
+
+- Name: The title of the video game. Each observation corresponds to a specific game released on a specific platform.
+
+- Genre: The primary genre classification of the game (Action, Shooter, Sports, Role-Playing, etc.). This categorical variable identifies the type of gameplay and is used to construct the treatment indicator for Shooter games.
+
+- Publisher: The company responsible for publishing the game (Nintendo, Electronic Arts, Activision). This variable allows us to control for differences in marketing capacity, brand reputation, and distribution networks.
+
+- Platform: The gaming console on which the game was released (PlayStation 2, Xbox, Wii). Because platform popularity and install base vary substantially, this variable is an important control for market exposure.
+
+- Year: The year in which the game was released. This variable captures time trends in the gaming industry, including overall market growth and changes in consumer preferences.
+
+- Sales: Regional and global sales measured in millions of copies sold. The dataset includes: NA_Sales (North America), EU_Sales (Europe), JP_Sales (Japan), Other_Sales, and Global_Sales, which is the sum of regional sales
+
+- In this situation, Global_Sales is used as the primary outcome variable.
+
