@@ -108,10 +108,20 @@ Because Shooter games are not randomly assigned across platforms or publishers, 
 library(tidyverse)
 vgsales <- read_csv("vgsales.csv")
 vgsales <- vgsales |>
-  mutate(Shooter = ifelse(Genre == "Shooter", 1, 0))
+  mutate(Shooter = ifelse(Genre == "Shooter", 1, 0),
+         Shooter = factor(Shooter))
+head(vgsales)
 ```
 
-## Plot
+## Summary Statistics
+
+```{r}
+summary(vgsales)
+```
+
+## Plots
+
+### Time-Series Plot
 
 ```{r}
 vgsales |>
@@ -126,16 +136,58 @@ vgsales |>
        color = "Shooter Game?")
 ```
 
-## Summary Statistics
+The graph shows a high degree of sporadic behavior in the first decade recorded by the data, but by the 1990s a general trend emerged with shooter and non-shooter game sales mostly at parity with one another. This trend began to fade in the second half of the 2000s, with shooters steadily increasing their sales lead over non-shooter games. This indicates that time may be a relevant variable to include.
+
+### Regional Sales Plots
 
 ```{r}
-summary(vgsales)
+vgsales_long <- vgsales |>
+  pivot_longer(cols = NA_Sales:Other_Sales,
+               names_to = "Region",
+               values_to = "Sales")
+
+vgsales_reg <- vgsales_long |>
+  group_by(Year, Region, Shooter) |>
+  summarize(Sales = mean(Sales, na.rm = TRUE))
+
+ggplot(vgsales_reg, aes(as.numeric(Year), Sales,
+                        color = factor(Shooter, labels = c("No", "Yes")),
+                        group = Shooter)) +
+  geom_line() +
+  facet_wrap(~Region) +
+  labs(x = "Year",
+       y = "Global Sales (in Millions)",
+       color = "Shooter Game?")
 ```
 
+These graphs show little variation in shooter game sales and relative popularity within or between graphs, indicating that region may not have a significant effect on sales.
+
 ## Regression
+
+### Simple Linear Regression
 
 ```{r}
 vg_mod <- lm(Global_Sales ~ Shooter, vgsales)
 summary(vg_mod)
 ```
 
+In a simple linear regression containing only the Shooter dummy variable, the coefficient is found to be statistically significant, providing evidence that a game's status as a shooter or non-shooter game affects sales.
+
+### Multiple Linear Regression
+
+```{r}
+library(lfe)
+vg_mod_pub <- felm(Global_Sales ~ Shooter | Publisher, vgsales)
+summary(vg_mod_pub)
+
+vg_mod_plat <- felm(Global_Sales ~ Shooter | Platform, vgsales)
+summary(vg_mod_plat)
+
+vg_mod_time <- felm(Global_Sales ~ Shooter | Year, vgsales)
+summary(vg_mod_time)
+
+vg_mod_reg <- felm(Global_Sales ~ Shooter | Region, vgsales_long)
+summary(vg_mod_reg)
+```
+
+Regressions with Publisher, Platform, Year, and Region respectively held as fixed effects produce results very similar to the simple linear regression, indicating that little omitted variable bias arises from the exclusion of these specific factors in the base model.
