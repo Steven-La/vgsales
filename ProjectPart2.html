@@ -526,7 +526,6 @@ publishers, the descriptive patterns alone cannot be interpreted
 causally. The purpose of this section is to show how these underlying
 differences shape the raw Shooter–sales relationship and to motivate the
 need for a more careful empirical strategy in the future.</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 4.4.3</code></pre>
 <pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
@@ -537,9 +536,8 @@ need for a more careful empirical strategy in the future.</p>
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>vgsales &lt;- read_csv(&quot;vgsales.csv&quot;)</code></pre>
-<pre><code>## Rows: 16598 Columns: 11
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+## Rows: 16598 Columns: 11
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (5): Name, Platform, Year, Genre, Publisher
@@ -547,10 +545,6 @@ need for a more careful empirical strategy in the future.</p>
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>vgsales &lt;- vgsales |&gt;
-  mutate(Shooter = ifelse(Genre == &quot;Shooter&quot;, 1, 0),
-         Shooter = factor(Shooter))
-head(vgsales)</code></pre>
 <pre><code>## # A tibble: 6 × 12
 ##    Rank Name           Platform Year  Genre Publisher NA_Sales EU_Sales JP_Sales
 ##   &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
@@ -563,7 +557,6 @@ head(vgsales)</code></pre>
 ## # ℹ 3 more variables: Other_Sales &lt;dbl&gt;, Global_Sales &lt;dbl&gt;, Shooter &lt;fct&gt;</code></pre>
 <div id="summary-statistics" class="section level2">
 <h2>Summary Statistics</h2>
-<pre class="r"><code>summary(vgsales)</code></pre>
 <pre><code>##       Rank           Name             Platform             Year          
 ##  Min.   :    1   Length:16598       Length:16598       Length:16598      
 ##  1st Qu.: 4151   Class :character   Class :character   Class :character  
@@ -585,21 +578,15 @@ head(vgsales)</code></pre>
 ##  Mean   : 0.07778   Mean   : 0.04806   Mean   : 0.5374            
 ##  3rd Qu.: 0.04000   3rd Qu.: 0.04000   3rd Qu.: 0.4700            
 ##  Max.   :10.22000   Max.   :10.57000   Max.   :82.7400</code></pre>
+<p>The summary statistics show information about each column in the
+dataset, showing in particular the different ranges and averages for
+each region. This also shows that the dataset has 15,288 non-shooter
+games compared to only 1,310 shooters.</p>
 </div>
 <div id="plots" class="section level2">
 <h2>Plots</h2>
 <div id="time-series-plot" class="section level3">
 <h3>Time-Series Plot</h3>
-<pre class="r"><code>vgsales |&gt;
-  group_by(Year, Shooter) |&gt;
-  summarize(Global_Sales = mean(Global_Sales)) |&gt;
-  ggplot(aes(as.numeric(Year), Global_Sales,
-             color = factor(Shooter, labels = c(&quot;No&quot;, &quot;Yes&quot;)),
-             group = Shooter)) +
-  geom_line() +
-  labs(x = &quot;Year&quot;,
-       y = &quot;Global Sales (in Millions)&quot;,
-       color = &quot;Shooter Game?&quot;)</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;Year&#39;. You can override using the
 ## `.groups` argument.</code></pre>
 <pre><code>## Warning in FUN(X[[i]], ...): NAs introduced by coercion</code></pre>
@@ -615,24 +602,8 @@ This indicates that time may be a relevant variable to include.</p>
 </div>
 <div id="regional-sales-plots" class="section level3">
 <h3>Regional Sales Plots</h3>
-<pre class="r"><code>vgsales_long &lt;- vgsales |&gt;
-  pivot_longer(cols = NA_Sales:Other_Sales,
-               names_to = &quot;Region&quot;,
-               values_to = &quot;Sales&quot;)
-
-vgsales_reg &lt;- vgsales_long |&gt;
-  group_by(Year, Region, Shooter) |&gt;
-  summarize(Sales = mean(Sales, na.rm = TRUE))</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;Year&#39;, &#39;Region&#39;. You can override using
 ## the `.groups` argument.</code></pre>
-<pre class="r"><code>ggplot(vgsales_reg, aes(as.numeric(Year), Sales,
-                        color = factor(Shooter, labels = c(&quot;No&quot;, &quot;Yes&quot;)),
-                        group = Shooter)) +
-  geom_line() +
-  facet_wrap(~Region) +
-  labs(x = &quot;Year&quot;,
-       y = &quot;Global Sales (in Millions)&quot;,
-       color = &quot;Shooter Game?&quot;)</code></pre>
 <pre><code>## Warning in FUN(X[[i]], ...): NAs introduced by coercion</code></pre>
 <pre><code>## Warning: Removed 8 rows containing missing values or values outside the scale range
 ## (`geom_line()`).</code></pre>
@@ -646,8 +617,6 @@ a significant effect on sales.</p>
 <h2>Regression</h2>
 <div id="simple-linear-regression" class="section level3">
 <h3>Simple Linear Regression</h3>
-<pre class="r"><code>vg_mod &lt;- lm(Global_Sales ~ Shooter, vgsales)
-summary(vg_mod)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = Global_Sales ~ Shooter, data = vgsales)
@@ -673,15 +642,12 @@ affects sales.</p>
 </div>
 <div id="multiple-linear-regression" class="section level3">
 <h3>Multiple Linear Regression</h3>
-<pre class="r"><code>library(lfe)</code></pre>
 <pre><code>## Loading required package: Matrix</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;Matrix&#39;</code></pre>
 <pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
 ## 
 ##     expand, pack, unpack</code></pre>
-<pre class="r"><code>vg_mod_pub &lt;- felm(Global_Sales ~ Shooter | Publisher, vgsales)
-summary(vg_mod_pub)</code></pre>
 <pre><code>## 
 ## Call:
 ##    felm(formula = Global_Sales ~ Shooter | Publisher, data = vgsales) 
@@ -701,8 +667,6 @@ summary(vg_mod_pub)</code></pre>
 ## Multiple R-squared(proj model): 0.001816   Adjusted R-squared: -0.03427 
 ## F-statistic(full model):3.461 on 579 and 16018 DF, p-value: &lt; 2.2e-16 
 ## F-statistic(proj model): 29.14 on 1 and 16018 DF, p-value: 6.82e-08</code></pre>
-<pre class="r"><code>vg_mod_plat &lt;- felm(Global_Sales ~ Shooter | Platform, vgsales)
-summary(vg_mod_plat)</code></pre>
 <pre><code>## 
 ## Call:
 ##    felm(formula = Global_Sales ~ Shooter | Platform, data = vgsales) 
@@ -722,8 +686,6 @@ summary(vg_mod_plat)</code></pre>
 ## Multiple R-squared(proj model): 0.002023   Adjusted R-squared: 0.0001551 
 ## F-statistic(full model):21.16 on 31 and 16566 DF, p-value: &lt; 2.2e-16 
 ## F-statistic(proj model): 33.57 on 1 and 16566 DF, p-value: 6.984e-09</code></pre>
-<pre class="r"><code>vg_mod_time &lt;- felm(Global_Sales ~ Shooter | Year, vgsales)
-summary(vg_mod_time)</code></pre>
 <pre><code>## 
 ## Call:
 ##    felm(formula = Global_Sales ~ Shooter | Year, data = vgsales) 
@@ -743,8 +705,6 @@ summary(vg_mod_time)</code></pre>
 ## Multiple R-squared(proj model): 0.002299   Adjusted R-squared: -0.0001112 
 ## F-statistic(full model):11.79 on 40 and 16557 DF, p-value: &lt; 2.2e-16 
 ## F-statistic(proj model): 38.16 on 1 and 16557 DF, p-value: 6.686e-10</code></pre>
-<pre class="r"><code>vg_mod_reg &lt;- felm(Global_Sales ~ Shooter | Region, vgsales_long)
-summary(vg_mod_reg)</code></pre>
 <pre><code>## 
 ## Call:
 ##    felm(formula = Global_Sales ~ Shooter | Region, data = vgsales_long) 

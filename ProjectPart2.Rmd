@@ -104,7 +104,7 @@ Because Shooter games are not randomly assigned across platforms or publishers, 
 
 
 
-```{r}
+```{r, echo=F}
 library(tidyverse)
 vgsales <- read_csv("vgsales.csv")
 vgsales <- vgsales |>
@@ -115,15 +115,17 @@ head(vgsales)
 
 ## Summary Statistics
 
-```{r}
+```{r, echo=F}
 summary(vgsales)
 ```
+
+The summary statistics show information about each column in the dataset, showing in particular the different ranges and averages for each region. This also shows that the dataset has 15,288 non-shooter games compared to only 1,310 shooters.
 
 ## Plots
 
 ### Time-Series Plot
 
-```{r}
+```{r, echo=F}
 vgsales |>
   group_by(Year, Shooter) |>
   summarize(Global_Sales = mean(Global_Sales)) |>
@@ -140,7 +142,7 @@ The graph shows a high degree of sporadic behavior in the first decade recorded 
 
 ### Regional Sales Plots
 
-```{r}
+```{r, echo=F}
 vgsales_long <- vgsales |>
   pivot_longer(cols = NA_Sales:Other_Sales,
                names_to = "Region",
@@ -166,7 +168,7 @@ These graphs show little variation in shooter game sales and relative popularity
 
 ### Simple Linear Regression
 
-```{r}
+```{r, echo=F}
 vg_mod <- lm(Global_Sales ~ Shooter, vgsales)
 summary(vg_mod)
 ```
@@ -175,7 +177,7 @@ In a simple linear regression containing only the Shooter dummy variable, the co
 
 ### Multiple Linear Regression
 
-```{r}
+```{r, echo=F}
 library(lfe)
 vg_mod_pub <- felm(Global_Sales ~ Shooter | Publisher, vgsales)
 summary(vg_mod_pub)
