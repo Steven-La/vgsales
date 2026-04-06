@@ -193,3 +193,18 @@ summary(vg_mod_reg)
 ```
 
 Regressions with Publisher, Platform, Year, and Region respectively held as fixed effects produce results very similar to the simple linear regression, indicating that little omitted variable bias arises from the exclusion of these specific factors in the base model.
+
+```{r}
+vgsales |>
+  filter(Name == "Duck Hunt")
+
+library(stargazer)
+stargazer(vgsales, type = "text")
+
+stargazer(vg_mod, type = "text")
+
+vgsales |>
+  filter(Shooter == 1) |>
+  arrange(desc(Global_Sales))
+```
+
