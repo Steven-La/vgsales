@@ -58,7 +58,7 @@ These factors create the possibility of omitted variable bias: Shooter games may
 
 ## Sample Coverage
 
-- The dataset represents the physical console videogame market over this period
+- The dataset represents the physical console video game market over this period for video games selling at least 100,000 copies.
 
 ## Unit of observation
 
