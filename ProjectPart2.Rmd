@@ -208,3 +208,6 @@ vgsales |>
   arrange(desc(Global_Sales))
 ```
 
+3. Summary table and graphs
+4. Analysis section bullet points + mention of fixed effects
+5. Showing models having roughly equal coefficients
