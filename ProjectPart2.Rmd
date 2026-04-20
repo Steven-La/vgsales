@@ -192,8 +192,8 @@ summary(vg_mod_time)
 vg_mod_reg <- felm(Global_Sales ~ Shooter | Region, vgsales_long)
 summary(vg_mod_reg)
 
-vg_mod_reg <- felm(Global_Sales ~ Shooter | Publisher + Platform + Year + Region, vgsales_long)
-summary(vg_mod_reg)
+vg_mod_full <- felm(Global_Sales ~ Shooter | Publisher + Platform + Year + Region, vgsales_long)
+summary(vg_mod_full)
 ```
 
 Regressions with Publisher, Platform, Year, and Region respectively held as fixed effects produce results very similar to the simple linear regression, indicating that little omitted variable bias arises from the exclusion of these specific factors in the base model.
