@@ -114,10 +114,20 @@ vgsales <- as.data.frame(vgsales)
 head(vgsales)
 ```
 
-## Summary Statistics
+## Summary Statistics and Data Overview
 
 ```{r, echo=F}
+library(stargazer)
+
 summary(vgsales)
+stargazer(vgsales, type = "text")
+stargazer(vg_mod, type = "text")
+
+vgsales |>
+  filter(Shooter == 0) |>
+  arrange(desc(Global_Sales))
+
+length(unique(vgsales$Publisher))
 ```
 
 The summary statistics show information about each column in the dataset, showing in particular the different ranges and averages for each region. This also shows that the dataset has 15,288 non-shooter games compared to only 1,310 shooters.
@@ -161,6 +171,10 @@ ggplot(vgsales_reg, aes(as.numeric(Year), Sales,
   labs(x = "Year",
        y = "Mean Global Sales (in Millions)",
        color = "Shooter Game?")
+
+# Outlier
+vgsales |>
+  filter(Name == "Duck Hunt")
 ```
 
 These graphs show little variation in shooter game sales and relative popularity within or between graphs, indicating that region may not have a significant effect on sales.
@@ -196,28 +210,4 @@ vg_mod_full <- felm(Global_Sales ~ Shooter | Publisher + Platform + Year + Regio
 summary(vg_mod_full)
 ```
 
-Regressions with Publisher, Platform, Year, and Region respectively held as fixed effects produce results very similar to the simple linear regression, indicating that little omitted variable bias arises from the exclusion of these specific factors in the base model.
-
-```{r}
-vgsales |>
-  filter(Name == "Duck Hunt")
-
-library(stargazer)
-stargazer(vgsales, type = "text")
-
-stargazer(vg_mod, type = "text")
-
-vgsales |>
-  filter(Shooter == 0) |>
-  arrange(desc(Global_Sales))
-
-length(unique(vgsales$Publisher))
-
-vgsales |>
-  filter(Year == 2006,
-         Shooter == 0)
-```
-
-3. Summary table and graphs
-4. Analysis section bullet points + mention of fixed effects
-5. Showing models having roughly equal coefficients
+Regressions with Publisher, Platform, Year, and Region respectively held as fixed effects produce results very similar to the simple linear regression, indicating that little omitted variable bias arises from the exclusion of these specific factors in the base model. Additionally, a model containing all of these factors as fixed effects produces similar results as the simple model and the individual fixed effects models, reinforcing these conclusions.
