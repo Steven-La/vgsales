@@ -110,6 +110,7 @@ vgsales <- read_csv("vgsales.csv")
 vgsales <- vgsales |>
   mutate(Shooter = ifelse(Genre == "Shooter", 1, 0),
          Shooter = factor(Shooter))
+vgsales <- as.data.frame(vgsales)
 head(vgsales)
 ```
 
@@ -134,7 +135,7 @@ vgsales |>
              group = Shooter)) +
   geom_line() +
   labs(x = "Year",
-       y = "Global Sales (in Millions)",
+       y = "Mean Global Sales (in Millions)",
        color = "Shooter Game?")
 ```
 
@@ -158,7 +159,7 @@ ggplot(vgsales_reg, aes(as.numeric(Year), Sales,
   geom_line() +
   facet_wrap(~Region) +
   labs(x = "Year",
-       y = "Global Sales (in Millions)",
+       y = "Mean Global Sales (in Millions)",
        color = "Shooter Game?")
 ```
 
@@ -190,6 +191,9 @@ summary(vg_mod_time)
 
 vg_mod_reg <- felm(Global_Sales ~ Shooter | Region, vgsales_long)
 summary(vg_mod_reg)
+
+vg_mod_reg <- felm(Global_Sales ~ Shooter | Publisher + Platform + Year + Region, vgsales_long)
+summary(vg_mod_reg)
 ```
 
 Regressions with Publisher, Platform, Year, and Region respectively held as fixed effects produce results very similar to the simple linear regression, indicating that little omitted variable bias arises from the exclusion of these specific factors in the base model.
@@ -199,13 +203,19 @@ vgsales |>
   filter(Name == "Duck Hunt")
 
 library(stargazer)
-stargazer(vgsales, type = "text", summary = TRUE)
+stargazer(vgsales, type = "text")
 
 stargazer(vg_mod, type = "text")
 
 vgsales |>
-  filter(Shooter == 1) |>
+  filter(Shooter == 0) |>
   arrange(desc(Global_Sales))
+
+length(unique(vgsales$Publisher))
+
+vgsales |>
+  filter(Year == 2006,
+         Shooter == 0)
 ```
 
 3. Summary table and graphs
