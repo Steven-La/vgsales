@@ -199,7 +199,7 @@ vgsales |>
   filter(Name == "Duck Hunt")
 
 library(stargazer)
-stargazer(vgsales, type = "text")
+stargazer(vgsales, type = "text", summary = TRUE)
 
 stargazer(vg_mod, type = "text")
 
