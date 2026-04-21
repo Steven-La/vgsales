@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This project examines whether being a Shooter video game causally increases global sales. Specifically, the question is:
 
-- **What is the effect of belonging to the Shooter genre on global sales of video games?**
+**What is the effect of belonging to the Shooter genre on global sales of video games?**
 
 The treatment variable (X) is an indicator equal to 1 if a game belongs to the Shooter genre, and 0 otherwise. The outcome variable (Y) is the global sales amount, measured in millions of copies sold.
 
@@ -27,17 +27,17 @@ This is a causal and economically meaningful question because we are not simply 
 
 This question is relevant to game developers, Publishers, investors, and platform companies such as Sony, Microsoft, and Nintendo. Knowing whether or not a certain genre (in this case shooter games) tends to generate higher sales is truly relevant to the gaming industry because it affects how development resources are allocated, how portfolios are structured, how marketing budgets are set, and even how platform exclusives are planned.
 
-Moreover, understanding whether the genre itself increases sales (holding other factors constant) also helps business decision-makers make more informed strategic coices. If being a Shooter game truly causes higher sales, firms can adjust their investment and planning accordingly.
+Moreover, understanding whether the genre itself increases sales (holding other factors constant) also helps business decision-makers make more informed strategic choices. If being a Shooter game truly causes higher sales, firms can adjust their investment and planning accordingly.
 
 ## Why this question is not obvious
 
 This question is not obvious because simply observing that a certain genre sells more does not mean the genre itself causes higher sales. Several other factors could influence this relationship and are also correlated with whether a game is a Shooter.
 
-- Platform differences: Where some can have larger audiences or even favor/support specific genres of games (Which will reflect on the sales for that video game).
+Platform differences: Where some can have larger audiences or even favor/support specific genres of games (Which will reflect on the sales for that video game).
 
-- Time trends: The gaming market has expanded significantly over time (From 1980s to 2010s). This could also have the idea that there was greater digital distribution of games (more available), and that consumer preferences for certain genres could have changed over time.
+Time trends: The gaming market has expanded significantly over time (From 1980s to 2010s). This could also have the idea that there was greater digital distribution of games (more available), and that consumer preferences for certain genres could have changed over time.
 
-- Popular franchises: The popularity of certain game titles could also be another variable that impacts sales rather than simply just genre. This is because big game franchises will have loyal fan bases, receive large marketing budgets, and get a lot of repeat sales. More or less, higher sales could reflect more brand recognition rather than genre.
+Popular franchises: The popularity of certain game titles could also be another variable that impacts sales rather than simply just genre. This is because big game franchises will have loyal fan bases, receive large marketing budgets, and get a lot of repeat sales. More or less, higher sales could reflect more brand recognition rather than genre.
 
 These factors all correlate with the Shooter variable, meaning they can create the appearance that Shooter games sell more even if the genre itself is not the true cause.
 
@@ -50,45 +50,47 @@ These factors create the possibility of omitted variable bias: Shooter games may
 
 ## Data Source
 
-- The primary dataset used in this analysis is the Video Game Sales dataset (1980–2016), originally compiled from retail sales data reported by VGChartz, a widely cited video game market tracking firm that aggregates global physical retail sales across major regions (North America, Europe, Japan, and Other regions). The dataset is publicly distributed for academic use via repositories such as: Kaggle and Public GitHub mirrors of the original VGChartz compilation.
+The primary dataset used in this analysis is the Video Game Sales dataset (1980–2016), originally compiled from retail sales data reported by VGChartz, a widely cited video game market tracking firm that aggregates global physical retail sales across major regions (North America, Europe, Japan, and Other regions). The dataset is publicly distributed for academic use via repositories such as: Kaggle and Public GitHub mirrors of the original VGChartz compilation.
 
-- The dataset is widely used in academic and applied data analysis projects studying video game market performance.
+The dataset is widely used in academic and applied data analysis projects studying video game market performance.
 
-- The dataset covers commercially released console video games between 1980 and 2016.
+The dataset covers commercially released console video games between 1980 and 2016.
+
+One notable feature of the dataset is the presence of extreme outliers, most prominently Duck Hunt (1984), which recorded unusually high global sales relative to other titles. This game was bundled with the Nintendo Entertainment System (NES) in many regions, causing its reported “sales” to reflect hardware‑bundle distribution rather than standalone consumer demand. Because of this, Duck Hunt behaves more like a platform‑level anomaly than a typical shooter title. The game is retained in the dataset for transparency, but its influence is evaluated later to ensure it does not distort estimates of the shooter genre’s effect on global sales.
 
 ## Sample Coverage
 
-- The dataset represents the physical console video game market over this period for video games selling at least 100,000 copies.
+The dataset represents the physical console video game market over this period for video games selling at least 100,000 copies.
 
 ## Unit of observation
 
-- Each row corresponds to a single game released on a specific platform.
+Each row corresponds to a single game released on a specific platform.
 
 ## Number of obsrvations
 
-- The dataset contains 16,599 game-platform observations.
+The dataset contains 16,599 game-platform observations.
 
 ## Frequency
 
-- Since it is based on release year of each video game, it is yearly data frequency.
+Since it is based on release year of each video game, it is yearly data frequency.
 
 ## Variables
 
 The dataset contains the following key variables:
 
-- Name: The title of the video game. Each observation corresponds to a specific game released on a specific platform.
+Name: The title of the video game. Each observation corresponds to a specific game released on a specific platform.
 
-- Genre: The primary genre classification of the game (Action, Shooter, Sports, Role-Playing, etc.). This categorical variable identifies the type of gameplay and is used to construct the treatment indicator for Shooter games.
+Genre: The primary genre classification of the game (Action, Shooter, Sports, Role-Playing, etc.). This categorical variable identifies the type of gameplay and is used to construct the treatment indicator for Shooter games.
 
-- Publisher: The company responsible for publishing the game (Nintendo, Electronic Arts, Activision). This variable allows us to control for differences in marketing capacity, brand reputation, and distribution networks.
+Publisher: The company responsible for publishing the game (Nintendo, Electronic Arts, Activision). This variable allows us to control for differences in marketing capacity, brand reputation, and distribution networks.
 
-- Platform: The gaming console on which the game was released (PlayStation 2, Xbox, Wii). Because platform popularity and install base vary substantially, this variable is an important control for market exposure.
+Platform: The gaming console on which the game was released (PlayStation 2, Xbox, Wii). Because platform popularity and install base vary substantially, this variable is an important control for market exposure.
 
-- Year: The year in which the game was released. This variable captures time trends in the gaming industry, including overall market growth and changes in consumer preferences.
+Year: The year in which the game was released. This variable captures time trends in the gaming industry, including overall market growth and changes in consumer preferences.
 
-- Sales: Regional and global sales measured in millions of copies sold. The dataset includes: NA_Sales (North America), EU_Sales (Europe), JP_Sales (Japan), Other_Sales, and Global_Sales, which is the sum of regional sales
+Sales: Regional and global sales measured in millions of copies sold. The dataset includes: NA_Sales (North America), EU_Sales (Europe), JP_Sales (Japan), Other_Sales, and Global_Sales, which is the sum of regional sales
 
-- In this situation, Global_Sales is used as the primary outcome variable.
+In this situation, Global_Sales is used as the primary outcome variable.
 
 
 # 3. Analysis
@@ -96,9 +98,12 @@ The dataset contains the following key variables:
 In this section, we explore the relationship between Shooter games and global sales using descriptive statistics, visualizations, and preliminary regression analysis. The goal is not to estimate a causal effect yet, but to understand what the data suggest and identify the main sources of confounding that must be addressed later.
 
 The analysis proceeds in three steps:
-- (i) we document basic patterns in global sales for Shooter and non‑Shooter games over time,
-- (ii) we examine how Shooter games are distributed across platforms, publishers, and years, and how these patterns may bias simple comparisons, and
-- (iii) we estimate a sequence of regressions that progressively control for platform, year, and publisher differences using a fixed‑effects approach.
+
+(i) we document basic patterns in global sales for Shooter and non‑Shooter games over time,
+
+(ii) we examine how Shooter games are distributed across platforms, publishers, and years, and how these patterns may bias simple comparisons, and
+
+(iii) we estimate a sequence of regressions that progressively control for platform, year, and publisher differences using a fixed‑effects approach.
 
 Because Shooter games are not randomly assigned across platforms or publishers, the descriptive patterns alone cannot be interpreted causally. The purpose of this section is to show how these underlying differences shape the raw Shooter–sales relationship and to motivate the need for a more careful empirical strategy in the future.
 
@@ -132,6 +137,8 @@ length(unique(vgsales$Publisher))
 The summary statistics show information about each column in the dataset, showing in particular the different ranges and averages for each region. This also shows that the dataset has 15,288 non-shooter games compared to only 1,310 shooters.
 
 ## Plots
+
+These plots summarize mean sales for Shooter and non‑Shooter games, allowing us to compare average performance across years and regions.
 
 ### Time-Series Plot
 
@@ -209,4 +216,8 @@ vg_mod_full <- felm(Global_Sales ~ Shooter | Publisher + Platform + Year + Regio
 summary(vg_mod_full)
 ```
 
-Regressions with Publisher, Platform, Year, and Region respectively held as fixed effects produce results very similar to the simple linear regression, indicating that little omitted variable bias arises from the exclusion of these specific factors in the base model. Additionally, a model containing all of these factors as fixed effects produces similar results as the simple model and the individual fixed effects models, reinforcing these conclusions.
+## Conclusion and Causality:
+
+Regressions with Publisher, Platform, Year, and Region respectively held as fixed effects produce results very similar to the simple linear regression, indicating that little omitted variable bias arises from the exclusion of these specific factors in the base model. Additionally, a model containing all of these factors as fixed effects produces similar results as the simple model and the individual fixed effects models, reinforcing these conclusions. 
+
+However, one important limitation that remains is the potential omission of game quality, an unobserved characteristic that is likely correlated with both genre and sales. Shooter games often share similar production values, design conventions, and franchise‑driven development cycles, which may make their average quality more homogeneous relative to other genres.If quality systematically differs between Shooter and non‑Shooter titles—and is not fully captured by publisher, platform, or year fixed effects—then the estimated Shooter coefficient may partially reflect these underlying quality differences rather than a pure genre effect. This remains a key source of unobserved heterogeneity that cannot be fully addressed with the available data.
