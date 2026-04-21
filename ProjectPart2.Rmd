@@ -121,7 +121,6 @@ library(stargazer)
 
 summary(vgsales)
 stargazer(vgsales, type = "text")
-stargazer(vg_mod, type = "text")
 
 vgsales |>
   filter(Shooter == 0) |>
