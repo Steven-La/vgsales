@@ -1,5 +1,5 @@
 ---
-title: "Project Part 2"
+title: "Final Project Report"
 author: "Steven Lautenbach & Mathias Thyssen"
 date: "2026-03-06"
 output: html_document
@@ -127,10 +127,6 @@ library(stargazer)
 summary(vgsales)
 stargazer(vgsales, type = "text")
 
-vgsales |>
-  filter(Shooter == 0) |>
-  arrange(desc(Global_Sales))
-
 length(unique(vgsales$Publisher))
 ```
 
@@ -216,8 +212,82 @@ vg_mod_full <- felm(Global_Sales ~ Shooter | Publisher + Platform + Year + Regio
 summary(vg_mod_full)
 ```
 
+## Log Transformation with Duck Hunt Exclusion
+
+In an effort to remedy some of the extreme values in the data, Duck Hunt was removed and sales were log-transformed in order to elicit a potentially more intuitive visual representation of the trends in the data.
+
+### Visualizations
+
+```{r, echo=F}
+vgsales_ndh <- vgsales |>
+  filter(Name != "Duck Hunt")
+
+vgsales_ndh |>
+  group_by(Year, Shooter) |>
+  summarize(Global_Sales = mean(Global_Sales)) |>
+  ggplot(aes(as.numeric(Year), log(Global_Sales),
+             color = factor(Shooter, labels = c("No", "Yes")),
+             group = Shooter)) +
+  geom_line() +
+  labs(x = "Year",
+       y = "Mean Global Sales (in Millions)",
+       color = "Shooter Game?")
+
+vgsales_long_ndh <- vgsales_ndh |>
+  pivot_longer(cols = NA_Sales:Other_Sales,
+               names_to = "Region",
+               values_to = "Sales")
+
+vgsales_reg_ndh <- vgsales_long_ndh |>
+  group_by(Year, Region, Shooter) |>
+  summarize(Sales = mean(Sales, na.rm = TRUE))
+
+ggplot(vgsales_reg_ndh, aes(as.numeric(Year), log(Sales),
+                        color = factor(Shooter, labels = c("No", "Yes")),
+                        group = Shooter)) +
+  geom_line() +
+  facet_wrap(~Region) +
+  labs(x = "Year",
+       y = "Mean Global Sales (in Millions)",
+       color = "Shooter Game?")
+```
+
+The log-corrected global sales graph more parsimoniously displays a similar version of the trend seen in the original, with sales of both categories being roughly the same prior to 2005, at which time shooter games began superseding non-shooters. The regional graphs also mirror their counterparts but in a much more visually apparent way, with European, North American, and Other sales resembling global patterns while Japan consistently prefers non-shooter games over shooters. This suggests that log-corrections may not drastically change the results of the regression models.
+
+### Regression Models
+
+```{r}
+vg_mod_ndh <- lm(log(Global_Sales) ~ Shooter, vgsales_ndh)
+summary(vg_mod_ndh)
+
+vg_mod_pub_ndh <- felm(log(Global_Sales) ~ Shooter |
+                         Publisher, vgsales_ndh)
+summary(vg_mod_pub_ndh)
+
+vg_mod_plat_ndh <- felm(log(Global_Sales) ~ Shooter |
+                          Platform, vgsales_ndh)
+summary(vg_mod_plat_ndh)
+
+vg_mod_time_ndh <- felm(log(Global_Sales) ~ Shooter |
+                          Year, vgsales_ndh)
+summary(vg_mod_time_ndh)
+
+vg_mod_reg_ndh <- felm(log(Global_Sales) ~ Shooter |
+                         Region, vgsales_long_ndh)
+summary(vg_mod_reg_ndh)
+
+vg_mod_full_ndh <- felm(log(Global_Sales) ~ Shooter |
+                          Publisher + Platform + Year + Region,
+                        vgsales_long_ndh)
+summary(vg_mod_full_ndh)
+```
+
+The `log(Global_Sales)` simple linear regression model has a `Shooter1` coefficient of about 0.334, which is similar to the models with fixed effects for Region, Year, and to a lesser extent Platform. However, including Publisher as an individual fixed effect or as part of the full fixed effects model produces a coefficient smaller by roughly half, indicating that the simple model is heavily biased upward. This demonstrates that including publisher fixed effects in the model is necessary to avoid omitted variable bias.
+
+Further adjustments, such as the inclusion of a variable controlling for the number of games published per year, may introduce collinearity and thus were not tested for. This specific example was already controlled for by the Year fixed effect, which accounted for the number of games published per year as well as all other factors varying at the year level.
+
 ## Conclusion and Causality:
 
-Regressions with Publisher, Platform, Year, and Region respectively held as fixed effects produce results very similar to the simple linear regression, indicating that little omitted variable bias arises from the exclusion of these specific factors in the base model. Additionally, a model containing all of these factors as fixed effects produces similar results as the simple model and the individual fixed effects models, reinforcing these conclusions. 
+Regressions with Publisher, Platform, Year, and Region respectively held as fixed effects produce results very similar to the simple linear regression, suggesting that little omitted variable bias arises from the exclusion of these specific factors in the base model. A model containing all of these factors as fixed effects produces results less similar to the simple model and the individual fixed effects models, but still at a fairly nonsubstantial magnitude, reinforcing these conclusions. However, log-transformed models with the Duck Hunt outlier removed were heavily biased when not including Publisher as a fixed effect, indicating that of these variables, Publisher is a necessity to include in any model for analyzing Global Sales.
 
-However, one important limitation that remains is the potential omission of game quality, an unobserved characteristic that is likely correlated with both genre and sales. Shooter games often share similar production values, design conventions, and franchise‑driven development cycles, which may make their average quality more homogeneous relative to other genres.If quality systematically differs between Shooter and non‑Shooter titles—and is not fully captured by publisher, platform, or year fixed effects—then the estimated Shooter coefficient may partially reflect these underlying quality differences rather than a pure genre effect. This remains a key source of unobserved heterogeneity that cannot be fully addressed with the available data.
+One important limitation that remains is the potential omission of game quality, an unobserved characteristic that is likely correlated with both genre and sales. Shooter games often share similar production values, design conventions, and franchise‑driven development cycles, which may make their average quality more homogeneous relative to other genres.If quality systematically differs between Shooter and non‑Shooter titles—and is not fully captured by publisher, platform, or year fixed effects—then the estimated Shooter coefficient may partially reflect these underlying quality differences rather than a pure genre effect. This remains a key source of unobserved heterogeneity that cannot be fully addressed with the available data.
